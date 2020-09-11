@@ -1,2 +1,2 @@
-# Zoo-Shop
-Application for Zoo Shop
+# Zoo-Shop-Back
+Back end for the entersprise application Zoo Shop
