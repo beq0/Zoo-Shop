@@ -1,0 +1,28 @@
+{
+  "name": "zoo-shop-back",
+  "version": "1.0.0",
+  "description": "Back end for the entersprise application Zoo Shop",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beq0/Zoo-Shop-Back.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beq0/Zoo-Shop-Back/issues"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "homepage": "https://github.com/beq0/Zoo-Shop-Back#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.5"
+  }
+}
