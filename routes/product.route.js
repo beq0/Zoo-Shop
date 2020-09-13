@@ -1,13 +1,15 @@
 const router = require('express').Router();
 const Product = require('../controllers/product.controller');
 
-router.get('/add', Product.addProduct);
+router.put('/add', Product.addProduct);
 
-router.get('/change', Product.changeProduct);
+router.put('/change', Product.changeProduct);
 
-router.get('/delete', Product.deleteProduct);
+router.delete('/delete', Product.deleteProduct);
 
-router.get('/all', Product.getProducts);
+router.get('/findProducts', Product.findProducts);
+
+router.get('/findAll', Product.findAll)
 
 router.get('/one', Product.getProduct);
 
