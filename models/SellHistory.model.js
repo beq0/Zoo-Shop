@@ -1,4 +1,4 @@
-const { ObjectID, ObjectId } = require('bson');
+const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
 
 const sellHistorySchema = mongoose.Schema({
