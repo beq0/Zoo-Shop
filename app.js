@@ -53,4 +53,6 @@ app.get('/tmp', async (req, res) => {
     res.status(200).send("Hello world!"); 
 });
 
+mongoose.set('useFindAndModify', false);
+
 module.exports = app;
