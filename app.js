@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const Product = require('./models/Product.model');
 const SellHistory = require('./models/SellHistory.model');
 const productRoute = require('./routes/product.route');
-const historyRoute = require('./routes/history.route');
+const historyRoute = require('./routes/sellHistory.route');
 
 mongoose.connect('mongodb://localhost/zoo_shop', {
     useUnifiedTopology: true,

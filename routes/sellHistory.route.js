@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const History = require('../controllers/history.controller');
+const History = require('../controllers/sellHistory.controller');
 
 router.put('/add', History.addHistory);
 
