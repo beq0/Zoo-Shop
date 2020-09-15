@@ -3,7 +3,7 @@ const SellHistory = require('../models/SellHistory.model');
 module.exports.addHistory = (req, res) => {
     const sellHistory = new SellHistory({
         productId: req.body.productId,
-        sellDate: req.body.sellDate,
+        sellDate: Date(),
         amount: req.body.amount
     });
     sellHistory.save().then(() => {
