@@ -1,6 +1,4 @@
 const Product = require('../models/Product.model');
-const { Mongoose } = require('mongoose');
-const { response } = require('../app');
 
 module.exports.addProduct = (req, res) => {
     const prod = new Product({

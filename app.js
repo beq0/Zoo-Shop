@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const Product = require('./models/Product.model');
 const SellHistory = require('./models/SellHistory.model');
 const productRoute = require('./routes/product.route');
+const historyRoute = require('./routes/sellHistory.route');
 
 mongoose.connect('mongodb://localhost/zoo_shop', {
     useUnifiedTopology: true,
@@ -49,9 +50,14 @@ app.use(express.urlencoded({ extended: false }));
 //Product routes
 app.use('/product', productRoute);
 
-app.get('/tmp', async (req, res) => {
-    res.status(200).send("Hello world!"); 
+//History routes
+app.use('/history', historyRoute);
+
+// catch 404 
+app.use('/*', (req, res, next) => {
+  res.status(404).json({ message: 'Not Found' });
 });
+
 
 mongoose.set('useFindAndModify', false);
 
