@@ -1,6 +1,7 @@
 const Product = require('../models/Product.model');
 
 module.exports.addProduct = (req, res) => {
+    console.log(req);
     const prod = new Product({
         name: req.body.name,
         originalPrice: req.body.originalPrice,
@@ -10,7 +11,8 @@ module.exports.addProduct = (req, res) => {
     });
     prod.save().then(() => {
         res.status(200).json({message: 'Saved Product!'});
-    }).catch(() => {
+    }).catch((error) => {
+        console.log(error);
         res.status(500).json({message: 'Internal Error!'});
     });
 };

@@ -5,6 +5,8 @@ const Product = require('./models/Product.model');
 const SellHistory = require('./models/SellHistory.model');
 const productRoute = require('./routes/product.route');
 const historyRoute = require('./routes/sellHistory.route');
+const bodyParser = require("body-parser");
+const cors = require('cors');
 
 mongoose.connect('mongodb://localhost/zoo_shop', {
     useUnifiedTopology: true,
@@ -44,8 +46,11 @@ mongoose.connect('mongodb://localhost/zoo_shop', {
 const app = express();
 
 dotenv.config();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 //Product routes
 app.use('/product', productRoute);

@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const Product = require('../controllers/product.controller');
 
-router.put('/add', Product.addProduct);
+router.post('/add', Product.addProduct);
 
-router.put('/change', Product.changeProduct);
+router.post('/change', Product.changeProduct);
 
 router.delete('/delete', Product.deleteProduct);
 
