@@ -1,7 +1,6 @@
 const Product = require('../models/Product.model');
 
 module.exports.addProduct = (req, res) => {
-    console.log(req);
     const prod = new Product({
         name: req.body.name,
         originalPrice: req.body.originalPrice,
@@ -10,10 +9,10 @@ module.exports.addProduct = (req, res) => {
         type: req.body.type
     });
     prod.save().then(() => {
-        res.status(200).json({message: 'Saved Product!'});
+        res.status(200).json({message: 'Saved Product!', status: 200, id: prod._id});
     }).catch((error) => {
         console.log(error);
-        res.status(500).json({message: 'Internal Error!'});
+        res.status(500).json({message: 'Internal Error!', status: 500});
     });
 };
 
@@ -43,12 +42,12 @@ module.exports.changeProduct = (req, res) => {
 
 module.exports.deleteProduct = (req, res) => {
     Product.findOneAndDelete(
-        { '_id': req.query.id },
+        { '_id': req.params.id },
         (err, doc) => {
             if (err) {
-                res.status(500).json({message: err});
+                res.status(500).json({message: err, status: 500});
             } else {
-                res.status(200).json({message: `Deleted Product ${req.body.id}!`});
+                res.status(200).json({message: `Deleted Product ${req.body.id}!`, status: 200});
             }
         }
     )
