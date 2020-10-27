@@ -6,11 +6,23 @@ const sellHistorySchema = mongoose.Schema({
         type: ObjectId,
         required: true
     },
+    productName: {
+        type: String,
+        required: true
+    },
     sellDate: {
         type: Date,
         required: true
     },
     amount: {
+        type: Number,
+        required: true
+    },
+    originalPrice: {
+        type: Number,
+        required: true
+    },
+    sellingPrice: {
         type: Number,
         required: true
     }

@@ -1,15 +1,18 @@
+const { update } = require('../models/Product.model');
 const Product = require('../models/Product.model');
 
 module.exports.addProduct = (req, res) => {
     const prod = new Product({
+        code: req.body.code,
         name: req.body.name,
+        productType: req.body.productType,
         originalPrice: req.body.originalPrice,
         sellingPrice: req.body.sellingPrice,
         quantity: req.body.quantity,
-        type: req.body.type
+        quantityType: req.body.quantityType
     });
     prod.save().then(() => {
-        res.status(200).json({message: 'Saved Product!', status: 200, id: prod._id});
+        res.status(200).json({message: 'Saved Product!', status: 200, _id: prod._id});
     }).catch((error) => {
         console.log(error);
         res.status(500).json({message: 'Internal Error!', status: 500});
@@ -17,24 +20,28 @@ module.exports.addProduct = (req, res) => {
 };
 
 module.exports.changeProduct = (req, res) => {
-    if (!req.body.id) {
+    if (!req.body._id) {
         res.status(500).json({message: 'Id of the Product not provided!'});
         return;
     }
     let updatedProduct = {}
+    if (req.body.code) updatedProduct['code'] = req.body.code;
     if (req.body.name) updatedProduct['name'] = req.body.name;
-    if (req.body.originalPrice) updatedProduct['originalPrice'] = req.body.originalPrice;
-    if (req.body.sellingPrice) updatedProduct['sellingPrice'] = req.body.sellingPrice;
-    if (req.body.quantity) updatedProduct['quantity'] = req.body.quantity;
-    if (req.body.type) updatedProduct['type'] = req.body.type;
+    if (req.body.productType) updatedProduct['productType'] = req.body.productType;
+    if (req.body.originalPrice || req.body.originalPrice === 0) updatedProduct['originalPrice'] = req.body.originalPrice;
+    if (req.body.sellingPrice || req.body.sellingPrice === 0) updatedProduct['sellingPrice'] = req.body.sellingPrice;
+    if (req.body.quantity || req.body.quantity === 0) updatedProduct['quantity'] = req.body.quantity;
+    if (req.body.quantityType) updatedProduct['quantityType'] = req.body.quantityType;
+    console.log(updatedProduct);
     Product.findOneAndUpdate(
-        { '_id': req.body.id },
+        { '_id': req.body._id },
         { $set: updatedProduct },
-        (err, doc) => {
+        (err) => {
             if (err) {
-                res.status(500).json({message: err});
+                console.log(err);
+                res.status(500).json({message: err, status: 500});
             } else {
-                res.status(200).json({message: `Updated Product ${req.body.id}!`});
+                res.status(200).json({message: `Updated Product ${req.body._id}!`, status: 200, _id: req.body._id});
             }
         }
     )
@@ -42,12 +49,12 @@ module.exports.changeProduct = (req, res) => {
 
 module.exports.deleteProduct = (req, res) => {
     Product.findOneAndDelete(
-        { '_id': req.params.id },
+        { '_id': req.params._id },
         (err, doc) => {
             if (err) {
                 res.status(500).json({message: err, status: 500});
             } else {
-                res.status(200).json({message: `Deleted Product ${req.body.id}!`, status: 200});
+                res.status(200).json({message: `Deleted Product ${req.body._id}!`, status: 200});
             }
         }
     )

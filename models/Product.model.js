@@ -1,10 +1,18 @@
 const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
+    code: {
+        type: String,
+        required: true,
+        unique: true
+    },
     name: {
         type: String,
         required: true,
         unique: true
+    },
+    productType: {
+        type: String
     },
     originalPrice: {
         type: Number,
@@ -12,13 +20,13 @@ const productSchema = mongoose.Schema({
     },
     sellingPrice: {
         type: Number,
-        required: true
+        default: 0
     },
     quantity: {
         type: Number,
         default: 0
     },
-    type: {
+    quantityType: {
         type: String,
         required: true
     }

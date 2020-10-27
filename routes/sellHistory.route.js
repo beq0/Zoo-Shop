@@ -1,11 +1,11 @@
 const router = require('express').Router();
 const History = require('../controllers/sellHistory.controller');
 
-router.put('/add', History.addHistory);
+router.post('/add', History.addHistory);
 
 router.delete('/delete', History.deleteHistory);
 
-router.get('/findHistories', History.findHistories);
+router.post('/findHistories', History.findHistories);
 
 router.get('/findAll', History.findAll);
 

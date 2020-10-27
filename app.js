@@ -17,8 +17,6 @@ mongoose.connect('mongodb://localhost/zoo_shop', {
   else console.log(error);
 });
 
-// uncomment if virgin
-
 // const product = new Product({
 //     name: 'Test Product',
 // 	originalPrice: 5,
