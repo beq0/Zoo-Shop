@@ -32,6 +32,11 @@ module.exports.deleteHistory = (req, res) => {
 };
 
 module.exports.findHistories = (req, res) => {
+    const page = parseInt(req.params.page)
+    const limit = parseInt(req.params.limit)
+    const startIndex = (page - 1) * limit
+    const endIndex = page * limit
+
     let sellHistoryForQuery = {}
     if (req.body.productId) sellHistoryForQuery['productId'] = req.body.productId;
     if (req.body.productName) sellHistoryForQuery['productName'] = new RegExp(req.body.productName, "i");
@@ -39,7 +44,7 @@ module.exports.findHistories = (req, res) => {
     if (req.body.sellDateFrom) sellHistoryForQuery['sellDate']['$gte'] = req.body.sellDateFrom;
     if (req.body.sellDateTo) sellHistoryForQuery['sellDate']['$lte'] = req.body.sellDateTo;
     if (req.body.amount || req.body.amount === 0) sellHistoryForQuery['amount'] = req.body.amount;
-    SellHistory.find(sellHistoryForQuery).then((histories) => {
+    SellHistory.find(sellHistoryForQuery).limit(limit).skip(startIndex).exec().then((histories) => {
         res.status(200).json(histories);
     }).catch((err) => {
         res.status(500).json({message: err});

@@ -1,12 +1,12 @@
 const router = require('express').Router();
-const History = require('../controllers/sellHistory.controller');
+const HistoryController = require('../controllers/sellHistory.controller');
 
-router.post('/add', History.addHistory);
+router.post('/add', HistoryController.addHistory);
 
-router.delete('/delete', History.deleteHistory);
+router.delete('/delete', HistoryController.deleteHistory);
 
-router.post('/findHistories', History.findHistories);
+router.post('/findHistories/:page/:limit', HistoryController.findHistories);
 
-router.get('/findAll', History.findAll);
+router.get('/findAll', HistoryController.findAll);
 
 module.exports = router;
