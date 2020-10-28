@@ -10,6 +10,10 @@ const sellHistorySchema = mongoose.Schema({
         type: String,
         required: true
     },
+    productType: {
+        type: String,
+        required: true
+    },
     sellDate: {
         type: Date,
         required: true
