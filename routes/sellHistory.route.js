@@ -9,6 +9,6 @@ router.post('/findHistories/:page/:limit', HistoryController.findHistories);
 
 router.get('/findAll', HistoryController.findAll);
 
-router.get('/getCount', HistoryController.getCount);
+router.post('/getCount', HistoryController.getCount);
 
 module.exports = router;

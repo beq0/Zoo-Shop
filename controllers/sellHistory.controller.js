@@ -64,7 +64,13 @@ module.exports.findAll = (req, res) => {
 }
 
 module.exports.getCount = (req, res) => {
-    SellHistory.countDocuments().then((count) => {
+    let sellHistoryForQuery = {}
+    if (req.body.productName) sellHistoryForQuery['productName'] = new RegExp(req.body.productName, "i");
+    if (req.body.productType) sellHistoryForQuery['productType'] = new RegExp(req.body.productType, "i");
+    if (req.body.sellDateFrom || req.body.sellDateTo) sellHistoryForQuery['sellDate'] = {}
+    if (req.body.sellDateFrom) sellHistoryForQuery['sellDate']['$gte'] = req.body.sellDateFrom;
+    if (req.body.sellDateTo) sellHistoryForQuery['sellDate']['$lte'] = req.body.sellDateTo;
+    SellHistory.countDocuments(sellHistoryForQuery).then((count) => {
         res.status(200).json(count);
     }).catch((err) => {
         res.status(500).json({message: err});
