@@ -9,7 +9,8 @@ module.exports.addHistory = (req, res) => {
         sellDate: req.body.sellDate,
         amount: req.body.amount,
         originalPrice: req.body.originalPrice,
-        sellingPrice: req.body.sellingPrice
+        sellingPrice: req.body.sellingPrice,
+        benefit: ((req.body.sellingPrice || 0) - (req.body.originalPrice || 0)) * req.body.amount
     });
     sellHistory.save().then(() => {
         res.status(200).json({message: `Saved SellHistory of product ${req.body.productId}!`});

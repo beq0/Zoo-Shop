@@ -29,6 +29,10 @@ const sellHistorySchema = mongoose.Schema({
     sellingPrice: {
         type: Number,
         required: true
+    },
+    benefit: {
+        type: Number,
+        default: 0
     }
 });
 
