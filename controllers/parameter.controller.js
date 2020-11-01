@@ -60,3 +60,32 @@ module.exports.findParameters = (req, res) => {
         res.status(500).json({message: err});
     })
 };
+
+module.exports.getParameter = (req, res) => {
+    if (!req.body.name || !req.body.parameterType) {
+        res.status(500).json({message: 'Both Parameter name and type must be specified to find it'});
+        return;
+    }
+    let parameterToFind = {
+        name: req.body.name,
+        parameterType: req.body.parameterType
+    }
+    Parameter.findOne(parameterToFind).then((parameter) => {
+        if (parameter) res.status(200).json(parameter);
+        else res.status(200).json(getDefaultParameter(req));
+    }).catch((err) => {
+        if (!req.body.defaultValue) {
+            res.status(500).json({message: `Error during finding Parameter: ${parameterToFind}`});
+        } else {
+            res.status(200).json(getDefaultParameter(req));
+        }
+    })
+};
+
+function getDefaultParameter(req) {
+    return {
+        name: req.body.name,
+        parameterType: req.body.parameterType,
+        value: req.body.defaultValue
+    };
+}

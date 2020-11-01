@@ -9,4 +9,6 @@ router.delete('/delete/:_id', Parameter.deleteParameter);
 
 router.get('/findParameters', Parameter.findParameters);
 
+router.post('/getParameter', Parameter.getParameter);
+
 module.exports = router;

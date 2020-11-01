@@ -50,7 +50,7 @@ module.exports.findHistories = (req, res) => {
     if (req.body.amount || req.body.amount === 0) sellHistoryForQuery['amount'] = req.body.amount;
 
     if (isPagination) {
-        SellHistory.find(sellHistoryForQuery).limit(limit).skip(startIndex).exec().then((histories) => {
+        SellHistory.find(sellHistoryForQuery).sort({createDate: 'desc'}).limit(limit).skip(startIndex).exec().then((histories) => {
             res.status(200).json(histories);
         }).catch((err) => {
             res.status(500).json({message: err});

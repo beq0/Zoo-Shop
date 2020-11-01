@@ -33,6 +33,10 @@ const sellHistorySchema = mongoose.Schema({
     benefit: {
         type: Number,
         default: 0
+    },
+    createDate: {
+        type: Date,
+        default: new Date()
     }
 });
 
