@@ -5,6 +5,7 @@ const Product = require('./models/Product.model');
 const SellHistory = require('./models/SellHistory.model');
 const productRoute = require('./routes/product.route');
 const historyRoute = require('./routes/sellHistory.route');
+const parameterRoute = require('./routes/parameter.route');
 const bodyParser = require("body-parser");
 const cors = require('cors');
 
@@ -50,11 +51,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-//Product routes
+// Product routes
 app.use('/product', productRoute);
 
-//History routes
+// History routes
 app.use('/history', historyRoute);
+
+// Parameter routes
+app.use('/parameter', parameterRoute);
 
 // catch 404 
 app.use('/*', (req, res, next) => {

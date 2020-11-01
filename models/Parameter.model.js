@@ -6,6 +6,13 @@ const parameterSchema = mongoose.Schema({
         required: true,
         unique: true
     },
+    description: {
+        type: String
+    },
+    parameterType: {
+        type: String,
+        required: true
+    },
     value: {
         type: String
     }
