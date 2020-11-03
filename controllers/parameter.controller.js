@@ -25,6 +25,7 @@ module.exports.changeParameter = (req, res) => {
     if (req.body.description) updatedParameter['description'] = req.body.description;
     if (req.body.parameterType) updatedParameter['parameterType'] = req.body.parameterType;
     if (req.body.value) updatedParameter['value'] = req.body.value;
+    updatedParameter['lastChangeDate'] = new Date();
     console.log(updatedParameter);
     Parameter.findOneAndUpdate(
         { '_id': req.body._id },
@@ -54,7 +55,7 @@ module.exports.deleteParameter = (req, res) => {
 };
 
 module.exports.findParameters = (req, res) => {
-    Parameter.find().then((parameters) => {
+    Parameter.find().sort({lastChangeDate: 'desc'}).then((parameters) => {
         res.status(200).json(parameters);
     }).catch((err) => {
         res.status(500).json({message: err});

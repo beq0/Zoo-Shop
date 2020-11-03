@@ -6,6 +6,10 @@ const sellHistorySchema = mongoose.Schema({
         type: ObjectId,
         required: true
     },
+    productCode: {
+        type: String,
+        required: true
+    },
     productName: {
         type: String,
         required: true
@@ -16,7 +20,8 @@ const sellHistorySchema = mongoose.Schema({
     },
     sellDate: {
         type: Date,
-        required: true
+        required: true,
+        default: new Date()
     },
     amount: {
         type: Number,

@@ -15,6 +15,10 @@ const parameterSchema = mongoose.Schema({
     },
     value: {
         type: String
+    },
+    lastChangeDate: {
+        type: Date,
+        default: new Date()
     }
 });
 

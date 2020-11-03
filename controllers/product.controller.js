@@ -9,7 +9,9 @@ module.exports.addProduct = (req, res) => {
         originalPrice: req.body.originalPrice,
         sellingPrice: req.body.sellingPrice,
         quantity: req.body.quantity,
-        quantityType: req.body.quantityType
+        quantityType: req.body.quantityType,
+        lastChangeDate: new Date(),
+        createDate: new Date()
     });
     prod.save().then(() => {
         res.status(200).json({message: 'Saved Product!', status: 200, _id: prod._id});
@@ -32,6 +34,7 @@ module.exports.changeProduct = (req, res) => {
     if (req.body.sellingPrice || req.body.sellingPrice === 0) updatedProduct['sellingPrice'] = req.body.sellingPrice;
     if (req.body.quantity || req.body.quantity === 0) updatedProduct['quantity'] = req.body.quantity;
     if (req.body.quantityType) updatedProduct['quantityType'] = req.body.quantityType;
+    updatedProduct['lastChangeDate'] = new Date();
     console.log(updatedProduct);
     Product.findOneAndUpdate(
         { '_id': req.body._id },
@@ -69,7 +72,7 @@ module.exports.findProducts = (req, res) => {
 };
 
 module.exports.findAll = (req, res) => {
-    Product.find().then((products) => {
+    Product.find().sort({lastChangeDate: 'desc'}).then((products) => {
         res.status(200).json(products);
     }).catch((err) => {
         res.status(500).json({message: err});

@@ -29,6 +29,14 @@ const productSchema = mongoose.Schema({
     quantityType: {
         type: String,
         required: true
+    },
+    lastChangeDate: {
+        type: Date,
+        default: new Date()
+    },
+    createDate: {
+        type: Date,
+        default: new Date()
     }
 });
 
