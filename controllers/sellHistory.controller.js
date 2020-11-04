@@ -1,9 +1,9 @@
 const SellHistory = require('../models/SellHistory.model');
 
 module.exports.addHistory = (req, res) => {
-    console.log(req.body)
     const sellHistory = new SellHistory({
         productId: req.body.productId,
+        productCode: req.body.productCode,
         productName: req.body.productName,
         productType: req.body.productType,
         sellDate: req.body.sellDate,
@@ -15,7 +15,6 @@ module.exports.addHistory = (req, res) => {
     sellHistory.save().then(() => {
         res.status(200).json({message: `Saved SellHistory of product ${req.body.productId}!`});
     }).catch((error) => {
-        console.log(error);
         res.status(500).json({message: 'Internal Error!'});
     });
 };
