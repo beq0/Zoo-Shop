@@ -37,6 +37,10 @@ const productSchema = mongoose.Schema({
     createDate: {
         type: Date,
         default: new Date()
+    },
+    official: {
+        type: Boolean,
+        default: true
     }
 });
 

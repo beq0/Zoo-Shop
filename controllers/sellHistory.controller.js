@@ -10,6 +10,7 @@ module.exports.addHistory = (req, res) => {
         amount: req.body.amount,
         originalPrice: req.body.originalPrice,
         sellingPrice: req.body.sellingPrice,
+        official: req.body.official,
         benefit: ((req.body.sellingPrice || 0) - (req.body.originalPrice || 0)) * req.body.amount
     });
     sellHistory.save().then(() => {
@@ -41,12 +42,22 @@ module.exports.findHistories = (req, res) => {
 
     let sellHistoryForQuery = {}
     if (req.body.productId) sellHistoryForQuery['productId'] = req.body.productId;
+    if (req.body.productCode) sellHistoryForQuery['productCode'] = req.body.productId;
     if (req.body.productName) sellHistoryForQuery['productName'] = new RegExp(req.body.productName, "i");
     if (req.body.productType) sellHistoryForQuery['productType'] = new RegExp(req.body.productType, "i");
-    if (req.body.sellDateFrom || req.body.sellDateTo) sellHistoryForQuery['sellDate'] = {}
-    if (req.body.sellDateFrom) sellHistoryForQuery['sellDate']['$gte'] = req.body.sellDateFrom;
-    if (req.body.sellDateTo) sellHistoryForQuery['sellDate']['$lte'] = req.body.sellDateTo;
+
+    const benefitFrom = req.body.benefitFrom, benefitTo = req.body.benefitTo;
+    if ((benefitFrom || benefitFrom === 0) || (benefitTo || benefitTo === 0)) sellHistoryForQuery['benefit'] = {};
+    if (benefitFrom || benefitFrom === 0) sellHistoryForQuery['benefit']['$gte'] = benefitFrom;
+    if (benefitTo || benefitTo === 0) sellHistoryForQuery['benefit']['$lte'] = benefitTo;
+
+    const sellDateFrom = req.body.sellDateFrom, sellDateTo = req.body.sellDateTo;
+    if (sellDateFrom || sellDateTo) sellHistoryForQuery['sellDate'] = {}
+    if (sellDateFrom) sellHistoryForQuery['sellDate']['$gte'] = sellDateFrom;
+    if (sellDateTo) sellHistoryForQuery['sellDate']['$lte'] = sellDateTo;
+
     if (req.body.amount || req.body.amount === 0) sellHistoryForQuery['amount'] = req.body.amount;
+    if (req.body.official || req.body.official === 0) sellHistoryForQuery['official'] = req.body.official;
 
     if (isPagination) {
         SellHistory.find(sellHistoryForQuery).sort({createDate: 'desc'}).limit(limit).skip(startIndex).exec().then((histories) => {
@@ -55,7 +66,7 @@ module.exports.findHistories = (req, res) => {
             res.status(500).json({message: err});
         })
     } else {
-        SellHistory.find(sellHistoryForQuery).then((histories) => {
+        SellHistory.find(sellHistoryForQuery).sort({createDate: 'desc'}).then((histories) => {
             res.status(200).json(histories);
         }).catch((err) => {
             res.status(500).json({message: err});
