@@ -68,7 +68,26 @@ module.exports.getProduct = (req, res) => {
 };
 
 module.exports.findProducts = (req, res) => {
-    res.status(200).json({message: 'Here all'});
+    let productsForQuery = {}
+    if (req.body.code) productsForQuery['code'] = new RegExp(req.body.code, "i");
+    if (req.body.name) productsForQuery['name'] = new RegExp(req.body.name, "i");
+    if (req.body.productType) productsForQuery['productType'] = new RegExp(req.body.productType, "i");
+
+    const startPrice = req.body.startPrice, endPrice = req.body.endPrice;
+    if ((startPrice || startPrice === 0) || (endPrice || endPrice === 0)) productsForQuery['sellingPrice'] = {};
+    if (startPrice || startPrice === 0) productsForQuery['sellingPrice']['$gte'] = startPrice;
+    if (endPrice || endPrice === 0) productsForQuery['sellingPrice']['$lte'] = endPrice;
+
+    const startLastChangeDate = req.body.startLastChangeDate, endLastChangeDate = req.body.endLastChangeDate;
+    if (startLastChangeDate || endLastChangeDate) productsForQuery['lastChangeDate'] = {};
+    if (startLastChangeDate) productsForQuery['lastChangeDate']['$gte'] = startLastChangeDate;
+    if (endLastChangeDate) productsForQuery['lastChangeDate']['$lte'] = endLastChangeDate;
+    console.log(productsForQuery);
+    Product.find(productsForQuery).sort({lastChangeDate: 'desc'}).then((products) => {
+        res.status(200).json(products);
+    }).catch((err) => {
+        res.status(500).json({message: err});
+    })
 };
 
 module.exports.findAll = (req, res) => {
