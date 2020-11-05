@@ -83,6 +83,8 @@ module.exports.findProducts = (req, res) => {
     if (startLastChangeDate || endLastChangeDate) productsForQuery['lastChangeDate'] = {};
     if (startLastChangeDate) productsForQuery['lastChangeDate']['$gte'] = startLastChangeDate;
     if (endLastChangeDate) productsForQuery['lastChangeDate']['$lte'] = endLastChangeDate;
+
+    if (req.body.official !== null && req.body.official !== undefined) productsForQuery['official'] = req.body.official;
     Product.find(productsForQuery).sort({lastChangeDate: 'desc'}).then((products) => {
         res.status(200).json(products);
     }).catch((err) => {
