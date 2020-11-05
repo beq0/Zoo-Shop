@@ -22,12 +22,12 @@ module.exports.addHistory = (req, res) => {
 
 module.exports.deleteHistory = (req, res) => {
     SellHistory.findOneAndDelete(
-        { '_id': req.query.id },
+        { '_id': req.params._id },
         (err, doc) => {
             if (err) {
-                res.status(500).json({message: err});
+                res.status(500).json({message: err, status: 500});
             } else {
-                res.status(200).json({message: `Deleted SellHistory ${req.body.id}!`});
+                res.status(200).json({message: `Deleted History ${req.params._id}!`, status: 200});
             }
         }
     )
@@ -58,7 +58,6 @@ module.exports.findHistories = (req, res) => {
 
     if (req.body.amount || req.body.amount === 0) sellHistoryForQuery['amount'] = req.body.amount;
     if (req.body.official !== null && req.body.official !== undefined) sellHistoryForQuery['official'] = req.body.official;
-    console.log(sellHistoryForQuery);
     if (isPagination) {
         SellHistory.find(sellHistoryForQuery).sort({createDate: 'desc'}).limit(limit).skip(startIndex).exec().then((histories) => {
             res.status(200).json(histories);

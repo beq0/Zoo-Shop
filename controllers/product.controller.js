@@ -35,7 +35,7 @@ module.exports.changeProduct = (req, res) => {
     if (req.body.sellingPrice || req.body.sellingPrice === 0) updatedProduct['sellingPrice'] = req.body.sellingPrice;
     if (req.body.quantity || req.body.quantity === 0) updatedProduct['quantity'] = req.body.quantity;
     if (req.body.quantityType) updatedProduct['quantityType'] = req.body.quantityType;
-    if (req.body.official) updatedProduct['official'] = req.body.official;
+    if (req.body.official !== null && req.body.official !== undefined) updatedProduct['official'] = req.body.official;
     updatedProduct['lastChangeDate'] = new Date();
     Product.findOneAndUpdate(
         { '_id': req.body._id },

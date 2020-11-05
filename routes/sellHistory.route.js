@@ -3,7 +3,7 @@ const HistoryController = require('../controllers/sellHistory.controller');
 
 router.post('/add', HistoryController.addHistory);
 
-router.delete('/delete', HistoryController.deleteHistory);
+router.delete('/delete/:_id', HistoryController.deleteHistory);
 
 router.post('/findHistories/:page/:limit/:isPagination', HistoryController.findHistories);
 
