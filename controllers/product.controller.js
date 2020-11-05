@@ -72,7 +72,7 @@ module.exports.findProducts = (req, res) => {
     let productsForQuery = {}
     if (req.body.code) productsForQuery['code'] = new RegExp(req.body.code, "i");
     if (req.body.name) productsForQuery['name'] = new RegExp(req.body.name, "i");
-    if (req.body.productType) productsForQuery['productType'] = new RegExp(req.body.productType, "i");
+    if (req.body.productType && req.body.productType !== 'ყველა') productsForQuery['productType'] = new RegExp(req.body.productType, "i");
 
     const startPrice = req.body.startPrice, endPrice = req.body.endPrice;
     if ((startPrice || startPrice === 0) || (endPrice || endPrice === 0)) productsForQuery['sellingPrice'] = {};

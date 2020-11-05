@@ -44,7 +44,7 @@ module.exports.findHistories = (req, res) => {
     if (req.body.productId) sellHistoryForQuery['productId'] = req.body.productId;
     if (req.body.productCode) sellHistoryForQuery['productCode'] = req.body.productId;
     if (req.body.productName) sellHistoryForQuery['productName'] = new RegExp(req.body.productName, "i");
-    if (req.body.productType) sellHistoryForQuery['productType'] = new RegExp(req.body.productType, "i");
+    if (req.body.productType && req.body.productType !== 'ყველა') sellHistoryForQuery['productType'] = new RegExp(req.body.productType, "i");
 
     const benefitFrom = req.body.benefitFrom, benefitTo = req.body.benefitTo;
     if ((benefitFrom || benefitFrom === 0) || (benefitTo || benefitTo === 0)) sellHistoryForQuery['benefit'] = {};
@@ -54,11 +54,11 @@ module.exports.findHistories = (req, res) => {
     const sellDateFrom = req.body.sellDateFrom, sellDateTo = req.body.sellDateTo;
     if (sellDateFrom || sellDateTo) sellHistoryForQuery['sellDate'] = {}
     if (sellDateFrom) sellHistoryForQuery['sellDate']['$gte'] = sellDateFrom;
-    if (sellDateTo) sellHistoryForQuery['sellDate']['$lte'] = sellDateTo;
+    if (sellDateTo) sellHistoryForQuery['sellDate']['$lt'] = sellDateTo;
 
     if (req.body.amount || req.body.amount === 0) sellHistoryForQuery['amount'] = req.body.amount;
-    if (req.body.official || req.body.official === 0) sellHistoryForQuery['official'] = req.body.official;
-
+    if (req.body.official !== null && req.body.official !== undefined) sellHistoryForQuery['official'] = req.body.official;
+    console.log(sellHistoryForQuery);
     if (isPagination) {
         SellHistory.find(sellHistoryForQuery).sort({createDate: 'desc'}).limit(limit).skip(startIndex).exec().then((histories) => {
             res.status(200).json(histories);
