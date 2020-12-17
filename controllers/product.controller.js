@@ -1,5 +1,7 @@
 const { update } = require('../models/Product.model');
 const Product = require('../models/Product.model');
+const SellHistory = require('../models/SellHistory.model');
+const historyController = require('./sellHistory.controller');
 
 module.exports.addProduct = (req, res) => {
     const prod = new Product({
@@ -98,4 +100,110 @@ module.exports.findAll = (req, res) => {
     }).catch((err) => {
         res.status(500).json({message: err});
     })
+}
+
+module.exports.sellProduct = async (req, res) => {
+    let _id = req.body._id;
+    let amount = req.body.amount;
+    let sellingPrice = req.body.sellingPrice;
+    let sellDate = req.body.sellDate;
+    console.log(_id, amount, sellingPrice);
+    if (!_id) {
+        res.status(500).json({message: 'Id of the Product not provided!'});
+        return;
+    }
+    if (!amount) {
+        res.status(500).json({message: `Amount to sell Product ${req.body._id} not provided!`});
+        return;
+    }
+    if (!(sellingPrice || sellingPrice === 0)) {
+        res.status(500).json({message: `Selling price to sell Product ${req.body._id} not provided!`});
+        return;
+    }
+    product = await getSingleProduct(_id);
+    console.log(product);
+
+    
+    product.quantity.sort((a, b) => a.createDate - b.createDate);
+    fullOriginalPrice = 0;
+    const startingOriginalPrice = product.quantity[0].originalPrice;
+    const fullAmountSold = amount;
+    while (amount != 0) {
+        let currOriginalPriceInfo = product.quantity[0];
+        let currQuantity = currOriginalPriceInfo.quantity;
+        let currOriginalPrice = currOriginalPriceInfo.originalPrice;
+        if (amount > currQuantity) {
+            fullOriginalPrice += currOriginalPrice * currQuantity;
+            product.quantity.shift();
+            amount -= currQuantity;
+        } else {
+            currQuantity -= amount;
+            fullOriginalPrice += currOriginalPrice * amount;
+            if (currQuantity === 0) {
+                product.quantity.shift(); 
+            } else {
+                product.quantity[0].quantity = currQuantity;
+            }
+            amount = 0;
+        }
+    }
+
+    product.originalPrice = product.quantity[0].originalPrice;
+    benefit = (sellingPrice * fullAmountSold) - fullOriginalPrice;
+    console.log(product.quantity, benefit);
+
+    try {
+        addSellHistory(product, fullAmountSold, startingOriginalPrice, sellingPrice, sellDate, benefit);
+    } catch (e) {
+        res.status(500).json({message: `Error occurred during adding sell history for product ${_id}`, status: 500});
+        return;
+    }
+
+    console.log(`Added Sell history for [ProductId: ${_id}, SellingPrice: ${sellingPrice}, SellDate: ${sellDate}]`);
+
+    let soldProduct = {
+        quantity: product.quantity,
+        originalPrice: product.originalPrice
+    }
+    soldProduct['lastChangeDate'] = new Date();
+    Product.findOneAndUpdate(
+        { '_id': req.body._id },
+        { $set: soldProduct },
+        (err) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({message: `Error occurred during selling a product ${_id}: ` + err, status: 500});
+            } else {
+                res.newQuantity = product.quantity;
+                res.newOriginalPrice = product.originalPrice;
+                res.status(200).json({message: `Sold ${amount} of Product ${req.body._id}!`, status: 200, _id: req.body._id});
+            }
+        }
+    )
+    console.log("endddd");
+};
+
+function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDate, benefit) {
+    const sellHistory = new SellHistory({
+        productId: product._id,
+        productCode: product.code,
+        productName: product.name,
+        productType: product.productType,
+        sellDate: sellDate,
+        amount: amountSold,
+        originalPrice: originalPrice,
+        sellingPrice: sellingPrice,
+        official: product.official,
+        benefit: benefit
+    });
+    sellHistory.save().then(() => {
+        
+    }).catch((error) => {
+        throw error;
+    });
+}
+
+async function getSingleProduct(productId) {
+    let product = await Product.findOne({_id: productId}).exec();
+    return product;
 }

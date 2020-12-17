@@ -13,4 +13,6 @@ router.get('/findAll', Product.findAll)
 
 router.get('/one', Product.getProduct);
 
+router.post('/sellProduct', Product.sellProduct);
+
 module.exports = router;
