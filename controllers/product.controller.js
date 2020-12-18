@@ -1,14 +1,13 @@
 const { update } = require('../models/Product.model');
 const Product = require('../models/Product.model');
 const SellHistory = require('../models/SellHistory.model');
-const historyController = require('./sellHistory.controller');
 
 module.exports.addProduct = (req, res) => {
     const prod = new Product({
         code: req.body.code,
         name: req.body.name,
         productType: req.body.productType,
-        originalPrice: req.body.originalPrice,
+        originalPrice: req.body.quantity[0].originalPrice,
         sellingPrice: req.body.sellingPrice,
         quantity: req.body.quantity,
         quantityType: req.body.quantityType,
@@ -33,9 +32,13 @@ module.exports.changeProduct = (req, res) => {
     if (req.body.code) updatedProduct['code'] = req.body.code;
     if (req.body.name) updatedProduct['name'] = req.body.name;
     if (req.body.productType) updatedProduct['productType'] = req.body.productType;
-    if (req.body.originalPrice || req.body.originalPrice === 0) updatedProduct['originalPrice'] = req.body.originalPrice;
+    let quantity = req.body.quantity;
+    if (quantity) {
+        quantity.sort((a, b) => a.createDate - b.createDate);
+        updatedProduct['originalPrice'] = quantity[0].originalPrice;
+    } 
     if (req.body.sellingPrice || req.body.sellingPrice === 0) updatedProduct['sellingPrice'] = req.body.sellingPrice;
-    if (req.body.quantity || req.body.quantity === 0) updatedProduct['quantity'] = req.body.quantity;
+    if (quantity) updatedProduct['quantity'] = quantity;
     if (req.body.quantityType) updatedProduct['quantityType'] = req.body.quantityType;
     if (req.body.official !== null && req.body.official !== undefined) updatedProduct['official'] = req.body.official;
     updatedProduct['lastChangeDate'] = new Date();
@@ -88,6 +91,7 @@ module.exports.findProducts = (req, res) => {
 
     if (req.body.official !== null && req.body.official !== undefined) productsForQuery['official'] = req.body.official;
     Product.find(productsForQuery).sort({lastChangeDate: 'desc'}).then((products) => {
+        products.forEach(product => product.quantity.sort((a, b) => a.createDate - b.createDate));
         res.status(200).json(products);
     }).catch((err) => {
         res.status(500).json({message: err});
@@ -107,7 +111,6 @@ module.exports.sellProduct = async (req, res) => {
     let amount = req.body.amount;
     let sellingPrice = req.body.sellingPrice;
     let sellDate = req.body.sellDate;
-    console.log(_id, amount, sellingPrice);
     if (!_id) {
         res.status(500).json({message: 'Id of the Product not provided!'});
         return;
@@ -121,9 +124,7 @@ module.exports.sellProduct = async (req, res) => {
         return;
     }
     product = await getSingleProduct(_id);
-    console.log(product);
 
-    
     product.quantity.sort((a, b) => a.createDate - b.createDate);
     fullOriginalPrice = 0;
     const startingOriginalPrice = product.quantity[0].originalPrice;
@@ -148,9 +149,9 @@ module.exports.sellProduct = async (req, res) => {
         }
     }
 
-    product.originalPrice = product.quantity[0].originalPrice;
+    if (product.quantity.length !== 0) product.originalPrice = product.quantity[0].originalPrice;
+    else product.originalPrice = null
     benefit = (sellingPrice * fullAmountSold) - fullOriginalPrice;
-    console.log(product.quantity, benefit);
 
     try {
         addSellHistory(product, fullAmountSold, startingOriginalPrice, sellingPrice, sellDate, benefit);
@@ -174,13 +175,11 @@ module.exports.sellProduct = async (req, res) => {
                 console.log(err);
                 res.status(500).json({message: `Error occurred during selling a product ${_id}: ` + err, status: 500});
             } else {
-                res.newQuantity = product.quantity;
-                res.newOriginalPrice = product.originalPrice;
-                res.status(200).json({message: `Sold ${amount} of Product ${req.body._id}!`, status: 200, _id: req.body._id});
+                res.status(200).json({message: `Sold ${amount} of Product ${req.body._id}!`, status: 200, _id: req.body._id, 
+                                        newQuantity: product.quantity, newOriginalPrice: product.originalPrice});
             }
         }
     )
-    console.log("endddd");
 };
 
 function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDate, benefit) {
