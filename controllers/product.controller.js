@@ -33,7 +33,7 @@ module.exports.changeProduct = (req, res) => {
     if (req.body.name) updatedProduct['name'] = req.body.name;
     if (req.body.productType) updatedProduct['productType'] = req.body.productType;
     let quantity = req.body.quantity;
-    if (quantity) {
+    if (quantity && quantity.length !== 0) {
         quantity.sort((a, b) => a.createDate - b.createDate);
         updatedProduct['originalPrice'] = quantity[0].originalPrice;
     } 
