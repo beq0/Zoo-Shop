@@ -42,7 +42,7 @@ module.exports.findHistories = (req, res) => {
 
     let sellHistoryForQuery = {}
     if (req.body.productId) sellHistoryForQuery['productId'] = req.body.productId;
-    if (req.body.productCode) sellHistoryForQuery['productCode'] = req.body.productId;
+    if (req.body.productCode) sellHistoryForQuery['productCode'] = new RegExp(req.body.productCode, "i");
     if (req.body.productName) sellHistoryForQuery['productName'] = new RegExp(req.body.productName, "i");
     if (req.body.productType && req.body.productType !== 'ყველა') sellHistoryForQuery['productType'] = new RegExp(req.body.productType, "i");
 
@@ -84,6 +84,7 @@ module.exports.findAll = (req, res) => {
 
 module.exports.getCount = (req, res) => {
     let sellHistoryForQuery = {}
+    if (req.body.productCode) sellHistoryForQuery['productCode'] = new RegExp(req.body.productCode, "i");
     if (req.body.productName) sellHistoryForQuery['productName'] = new RegExp(req.body.productName, "i");
     if (req.body.productType) sellHistoryForQuery['productType'] = new RegExp(req.body.productType, "i");
     if (req.body.sellDateFrom || req.body.sellDateTo) sellHistoryForQuery['sellDate'] = {}

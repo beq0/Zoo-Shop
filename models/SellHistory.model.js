@@ -27,6 +27,10 @@ const sellHistorySchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    quantityType: {
+        type: String,
+        required: true
+    },
     originalPrice: {
         type: Number,
         required: true
