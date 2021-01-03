@@ -194,7 +194,8 @@ function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDa
         originalPrice: originalPrice,
         sellingPrice: sellingPrice,
         official: product.official,
-        benefit: benefit
+        benefit: benefit, 
+        createDate: new Date()
     });
     sellHistory.save().then(() => {
         
