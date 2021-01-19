@@ -1,4 +1,5 @@
 const Parameter = require('../models/Parameter.model');
+const Management = require('../models/Management.model');
 
 module.exports.addParameter = (req, res) => {
     const param = new Parameter({
@@ -20,38 +21,56 @@ module.exports.changeParameter = (req, res) => {
         res.status(500).json({message: 'Id of the Parameter not provided!'});
         return;
     }
-    let updatedParameter = {}
-    if (req.body.name) updatedParameter['name'] = req.body.name;
-    if (req.body.description) updatedParameter['description'] = req.body.description;
-    if (req.body.parameterType) updatedParameter['parameterType'] = req.body.parameterType;
-    if (req.body.value) updatedParameter['value'] = req.body.value;
-    updatedParameter['lastChangeDate'] = new Date();
-    console.log(updatedParameter);
-    Parameter.findOneAndUpdate(
-        { '_id': req.body._id },
-        { $set: updatedParameter },
-        (err) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({message: err, status: 500});
+    Management.findOne({name: getManagementName(), password: req.body.password})
+        .then((management) => {
+            if (management) {
+                let updatedParameter = {}
+                if (req.body.name) updatedParameter['name'] = req.body.name;
+                if (req.body.description) updatedParameter['description'] = req.body.description;
+                if (req.body.parameterType) updatedParameter['parameterType'] = req.body.parameterType;
+                if (req.body.value) updatedParameter['value'] = req.body.value;
+                updatedParameter['lastChangeDate'] = new Date();
+                console.log(updatedParameter);
+                Parameter.findOneAndUpdate(
+                    { '_id': req.body._id },
+                    { $set: updatedParameter },
+                    (err) => {
+                        if (err) {
+                            console.log(err);
+                            res.status(500).json({message: err, status: 500});
+                        } else {
+                            res.status(200).json({message: `Updated Parameter ${req.body._id}!`, status: 200, _id: req.body._id});
+                        }
+                    }
+                );
             } else {
-                res.status(200).json({message: `Updated Parameter ${req.body._id}!`, status: 200, _id: req.body._id});
+                res.status(500).json({message: `Management not found / Wrong password druing changing Parameter`});
             }
-        }
-    )
+        }).catch((err) => {
+            res.status(500).json({message: `Internal Error! Could not find Management to change Parameter`});
+        })
 };
 
 module.exports.deleteParameter = (req, res) => {
-    Parameter.findOneAndDelete(
-        { '_id': req.params._id },
-        (err, doc) => {
-            if (err) {
-                res.status(500).json({message: err, status: 500});
+    Management.findOne({name: getManagementName(), password: req.params.password})
+        .then((management) => {
+            if (management) {
+                Parameter.findOneAndDelete(
+                    { '_id': req.params._id },
+                    (err, doc) => {
+                        if (err) {
+                            res.status(500).json({message: err, status: 500});
+                        } else {
+                            res.status(200).json({message: `Deleted Parameter ${req.body._id}!`, status: 200});
+                        }
+                    }
+                );
             } else {
-                res.status(200).json({message: `Deleted Parameter ${req.body._id}!`, status: 200});
+                res.status(500).json({message: `Management not found / Wrong password druing deleting Parameter`});
             }
-        }
-    )
+        }).catch((err) => {
+            res.status(500).json({message: `Internal Error! Could not find Management to delete Parameter`});
+        })
 };
 
 module.exports.findParameters = (req, res) => {
@@ -89,4 +108,8 @@ function getDefaultParameter(req) {
         parameterType: req.body.parameterType,
         value: req.body.defaultValue
     };
+}
+
+function getManagementName() {
+    return 'Management';
 }

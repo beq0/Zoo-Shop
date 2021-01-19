@@ -1,4 +1,5 @@
 const SellHistory = require('../models/SellHistory.model');
+const Management = require('../models/Management.model');
 
 module.exports.addHistory = (req, res) => {
     const sellHistory = new SellHistory({
@@ -22,16 +23,25 @@ module.exports.addHistory = (req, res) => {
 };
 
 module.exports.deleteHistory = (req, res) => {
-    SellHistory.findOneAndDelete(
-        { '_id': req.params._id },
-        (err, doc) => {
-            if (err) {
-                res.status(500).json({message: err, status: 500});
+    Management.findOne({name: getManagementName(), password: req.params.password})
+        .then((management) => {
+            if (management) {
+                SellHistory.findOneAndDelete(
+                    { '_id': req.params._id },
+                    (err, doc) => {
+                        if (err) {
+                            res.status(500).json({message: err, status: 500});
+                        } else {
+                            res.status(200).json({message: `Deleted History ${req.params._id}!`, status: 200});
+                        }
+                    }
+                );
             } else {
-                res.status(200).json({message: `Deleted History ${req.params._id}!`, status: 200});
+                res.status(500).json({message: `Management not found / Wrong password druing deleting History`});
             }
-        }
-    )
+        }).catch((err) => {
+            res.status(500).json({message: `Internal Error! Could not find Management to delete History`});
+        })
 };
 
 module.exports.findHistories = (req, res) => {
@@ -96,4 +106,8 @@ module.exports.getCount = (req, res) => {
     }).catch((err) => {
         res.status(500).json({message: err});
     })
+}
+
+function getManagementName() {
+    return 'Management';
 }

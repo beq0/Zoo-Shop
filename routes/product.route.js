@@ -5,7 +5,7 @@ router.post('/add', Product.addProduct);
 
 router.post('/change', Product.changeProduct);
 
-router.delete('/delete/:_id', Product.deleteProduct);
+router.delete('/delete/:_id/:password', Product.deleteProduct);
 
 router.post('/findProducts', Product.findProducts);
 

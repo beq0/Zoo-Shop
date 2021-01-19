@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const productRoute = require('./routes/product.route');
 const historyRoute = require('./routes/sellHistory.route');
 const parameterRoute = require('./routes/parameter.route');
+const managementRoute = require('./routes/management.route');
 const bodyParser = require("body-parser");
 const cors = require('cors');
 const frontendApp = require('./public/App');
@@ -37,6 +38,10 @@ app.use('/api/history', historyRoute);
 
 // Parameter routes
 app.use('/api/parameter', parameterRoute);
+
+// Management routes
+app.use('/api/management', managementRoute);
+
 
 // catch 404 
 app.use('/api/*', (req, res, next) => {
@@ -75,6 +80,7 @@ app.get('/home', returnFrontendApp);
 app.get('/products', returnFrontendApp);
 app.get('/history', returnFrontendApp);
 app.get('/parameter', returnFrontendApp);
+app.get('/management', returnFrontendApp);
 
 app.get('*', (req, res) => {
   res.write(`

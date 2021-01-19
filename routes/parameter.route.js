@@ -5,7 +5,7 @@ router.post('/add', Parameter.addParameter);
 
 router.post('/change', Parameter.changeParameter);
 
-router.delete('/delete/:_id', Parameter.deleteParameter);
+router.delete('/delete/:_id/:password', Parameter.deleteParameter);
 
 router.get('/findParameters', Parameter.findParameters);
 

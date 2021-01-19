@@ -1,6 +1,7 @@
 const { update } = require('../models/Product.model');
 const Product = require('../models/Product.model');
 const SellHistory = require('../models/SellHistory.model');
+const Management = require('../models/Management.model');
 
 module.exports.addProduct = (req, res) => {
     const prod = new Product({
@@ -28,45 +29,63 @@ module.exports.changeProduct = (req, res) => {
         res.status(500).json({message: 'Id of the Product not provided!'});
         return;
     }
-    let updatedProduct = {}
-    if (req.body.code) updatedProduct['code'] = req.body.code;
-    if (req.body.name) updatedProduct['name'] = req.body.name;
-    if (req.body.productType) updatedProduct['productType'] = req.body.productType;
-    let quantity = req.body.quantity;
-    if (quantity && quantity.length !== 0) {
-        quantity.sort((a, b) => a.createDate - b.createDate);
-        updatedProduct['originalPrice'] = quantity[0].originalPrice;
-    } 
-    if (req.body.sellingPrice || req.body.sellingPrice === 0) updatedProduct['sellingPrice'] = req.body.sellingPrice;
-    if (quantity) updatedProduct['quantity'] = quantity;
-    if (req.body.quantityType) updatedProduct['quantityType'] = req.body.quantityType;
-    if (req.body.official !== null && req.body.official !== undefined) updatedProduct['official'] = req.body.official;
-    updatedProduct['lastChangeDate'] = new Date();
-    Product.findOneAndUpdate(
-        { '_id': req.body._id },
-        { $set: updatedProduct },
-        (err) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({message: err, status: 500});
+    Management.findOne({name: getManagementName(), password: req.body.password})
+        .then((management) => {
+            if (management) {
+                let updatedProduct = {}
+                if (req.body.code) updatedProduct['code'] = req.body.code;
+                if (req.body.name) updatedProduct['name'] = req.body.name;
+                if (req.body.productType) updatedProduct['productType'] = req.body.productType;
+                let quantity = req.body.quantity;
+                if (quantity && quantity.length !== 0) {
+                    quantity.sort((a, b) => a.createDate - b.createDate);
+                    updatedProduct['originalPrice'] = quantity[0].originalPrice;
+                } 
+                if (req.body.sellingPrice || req.body.sellingPrice === 0) updatedProduct['sellingPrice'] = req.body.sellingPrice;
+                if (quantity) updatedProduct['quantity'] = quantity;
+                if (req.body.quantityType) updatedProduct['quantityType'] = req.body.quantityType;
+                if (req.body.official !== null && req.body.official !== undefined) updatedProduct['official'] = req.body.official;
+                updatedProduct['lastChangeDate'] = new Date();
+                Product.findOneAndUpdate(
+                    { '_id': req.body._id },
+                    { $set: updatedProduct },
+                    (err) => {
+                        if (err) {
+                            console.log(err);
+                            res.status(500).json({message: err, status: 500});
+                        } else {
+                            res.status(200).json({message: `Updated Product ${req.body._id}!`, status: 200, _id: req.body._id});
+                        }
+                    }
+                );
             } else {
-                res.status(200).json({message: `Updated Product ${req.body._id}!`, status: 200, _id: req.body._id});
+                res.status(500).json({message: `Management not found / Wrong password druing changing Product`});
             }
-        }
-    )
+        }).catch((err) => {
+            res.status(500).json({message: `Internal Error! Could not find Management to change Product`});
+        })
 };
 
 module.exports.deleteProduct = (req, res) => {
-    Product.findOneAndDelete(
-        { '_id': req.params._id },
-        (err, doc) => {
-            if (err) {
-                res.status(500).json({message: err, status: 500});
+    Management.findOne({name: getManagementName(), password: req.params.password})
+        .then((management) => {
+            if (management) {
+                Product.findOneAndDelete(
+                    { '_id': req.params._id },
+                    (err, doc) => {
+                        if (err) {
+                            res.status(500).json({message: err, status: 500});
+                        } else {
+                            res.status(200).json({message: `Deleted Product ${req.body._id}!`, status: 200});
+                        }
+                    }
+                );
             } else {
-                res.status(200).json({message: `Deleted Product ${req.body._id}!`, status: 200});
+                res.status(500).json({message: `Management not found / Wrong password druing deleting Product`});
             }
-        }
-    )
+        }).catch((err) => {
+            res.status(500).json({message: `Internal Error! Could not find Management to delete Product`});
+        })
 };
 
 module.exports.getProduct = (req, res) => {
@@ -207,4 +226,8 @@ function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDa
 async function getSingleProduct(productId) {
     let product = await Product.findOne({_id: productId}).exec();
     return product;
+}
+
+function getManagementName() {
+    return 'Management';
 }
