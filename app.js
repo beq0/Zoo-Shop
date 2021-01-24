@@ -81,6 +81,7 @@ app.get('/products', returnFrontendApp);
 app.get('/history', returnFrontendApp);
 app.get('/parameter', returnFrontendApp);
 app.get('/management', returnFrontendApp);
+app.get('/scanner', returnFrontendApp);
 
 app.get('*', (req, res) => {
   res.write(`
