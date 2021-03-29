@@ -10,6 +10,14 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    providerCode: {
+        type:String,
+        required: true
+    },
+    providerName: {
+        type: String,
+        required: true
+    },
     productType: {
         type: String
     },

@@ -7,6 +7,8 @@ module.exports.addProduct = (req, res) => {
     const prod = new Product({
         code: req.body.code,
         name: req.body.name,
+        providerCode: req.body.providerCode,
+        providerName: req.body.providerName,
         productType: req.body.productType,
         originalPrice: req.body.quantity[0].originalPrice,
         sellingPrice: req.body.sellingPrice,
@@ -35,6 +37,8 @@ module.exports.changeProduct = (req, res) => {
                 let updatedProduct = {}
                 if (req.body.code) updatedProduct['code'] = req.body.code;
                 if (req.body.name) updatedProduct['name'] = req.body.name;
+                if (req.body.providerCode) updatedProduct['providerCode'] = req.body.providerCode;
+                if (req.body.providerName) updatedProduct['providerName'] = req.body.providerName;
                 if (req.body.productType) updatedProduct['productType'] = req.body.productType;
                 let quantity = req.body.quantity;
                 if (quantity && quantity.length !== 0) {
