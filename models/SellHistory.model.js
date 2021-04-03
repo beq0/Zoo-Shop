@@ -50,6 +50,9 @@ const sellHistorySchema = mongoose.Schema({
     official: {
         type: Boolean,
         default: true
+    },
+    description: {
+        type: String
     }
 });
 

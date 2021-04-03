@@ -13,6 +13,7 @@ module.exports.addHistory = (req, res) => {
         sellingPrice: req.body.sellingPrice,
         official: req.body.official,
         benefit: ((req.body.sellingPrice || 0) - (req.body.originalPrice || 0)) * req.body.amount,
+        description: req.body.description,
         createDate: new Date()
     });
     sellHistory.save().then(() => {
