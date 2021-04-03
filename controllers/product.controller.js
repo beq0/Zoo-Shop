@@ -26,6 +26,10 @@ module.exports.addProduct = (req, res) => {
     });
 };
 
+module.exports.addProducts = (req, res) => {
+    console.log(req.file);
+}
+
 module.exports.changeProduct = (req, res) => {
     if (!req.body._id) {
         res.status(500).json({message: 'Id of the Product not provided!'});

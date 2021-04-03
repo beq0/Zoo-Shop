@@ -3,6 +3,8 @@ const Product = require('../controllers/product.controller');
 
 router.post('/add', Product.addProduct);
 
+router.post('/addProducts', Product.addProducts);
+
 router.post('/change', Product.changeProduct);
 
 router.delete('/delete/:_id/:password', Product.deleteProduct);
