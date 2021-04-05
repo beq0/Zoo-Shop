@@ -9,7 +9,8 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const frontendApp = require('./public/App');
 const path = require("path");
-
+const multer  = require('multer');
+const upload = multer({ dest: 'uploads/' }); 
 
 mongoose.connect('mongodb://localhost/zoo_shop', {
     useUnifiedTopology: true,
@@ -31,7 +32,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Product routes
-app.use('/api/product', productRoute);
+app.use('/api/product', upload.single("file"), productRoute);
 
 // History routes
 app.use('/api/history', historyRoute);
@@ -41,7 +42,6 @@ app.use('/api/parameter', parameterRoute);
 
 // Management routes
 app.use('/api/management', managementRoute);
-
 
 // catch 404 
 app.use('/api/*', (req, res, next) => {
