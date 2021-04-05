@@ -31,52 +31,70 @@ module.exports.addProduct = (req, res) => {
 };
 
 module.exports.addProducts = (req, res) => {
-    fs.readFile(req.file.path, (err, data) => {
+    fs.readFile(req.file.path, async (err, data) => {
         if(err) return console.log(err);
-
-        const workbook = XLSX.read(data, {type: 'buffer'});
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const max = sheet['!ref'].substring(sheet['!ref'].indexOf(':') + 2);
-        const generators = new Generators();
-        const columnGenerator = generators.columnGenerator(max)
-
-        let productCodes = new Set();
-        while(true) {
-            let index = columnGenerator.next();
-            if(index.done) break;
-            let toAdd = {
-                code : sheet['A' + index.value].v,
-                name : sheet['B' + index.value].v,
-                providerCode : sheet['C' + index.value].v,
-                providerName : sheet['D' + index.value].v,
-                type : sheet['E' + index.value].v,
-                sellingPrice : sheet['F' + index.value].v,
-                quantity : sheet['G' + index.value].v,
-                originalPrice : sheet['H' + index.value].v,
-                quantityType : sheet['I' + index.value].v,
-                official : sheet['J' + index.value].v
-            }
-            if(!productsToSave.has(toAdd.code)) {
-                // save in database
-                productCodes.add(toAdd.code);
-            } 
-            else {
-                // update so that prices are saved correctly
-            }
-        }
-
         
-        // delete all files in uploads folder
-        fs.readdir('uploads', (e1, files) => {
-            if(e1) return console.log(e1);
+        try {
+            const workbook = XLSX.read(data, {type: 'buffer'});
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const max = sheet['!ref'].substring(sheet['!ref'].indexOf(':') + 2);
+            const generators = new Generators();
+            const columnGenerator = generators.columnGenerator(max)
 
-            for (let file of files) {
-                fs.unlink(path.join('uploads', file), (e2) => {
-                    if(e2) return console.log(e2);
-                })
+            let productCodes = new Set();
+            let productsAdded = [];
+            while(true) {
+                let index = columnGenerator.next();
+                if(index.done) break;
+                let toAdd = {
+                    code : sheet['A' + index.value].v,
+                    name : sheet['B' + index.value].v,
+                    providerCode : sheet['C' + index.value].v,
+                    providerName : sheet['D' + index.value].v,
+                    productType : sheet['E' + index.value].v,
+                    sellingPrice : sheet['F' + index.value].v,
+                    quantity : [
+                        {
+                            quantity: sheet['G' + index.value].v,
+                            originalPrice : sheet['H' + index.value].v,
+                            createDate: new Date()
+                        }
+                    ],
+                    originalPrice : sheet['H' + index.value].v,
+                    quantityType : sheet['I' + index.value].v,
+                    official : (sheet['J' + index.value].v == 'კი')
+                }
+                if(!productCodes.has(toAdd.code)) {
+                    const prod = new Product({
+                        ...toAdd,
+                        lastChangeDate: new Date(),
+                        createDate: new Date(),
+                    });
+                    productCodes.add(toAdd.code);
+                    const result = await prod.save();
+                    productsAdded.push(result);
+                } 
+                else {
+                    // update so that prices are saved correctly
+                }
             }
-        })
+            res.status(200).json({message: 'Saved Products!', status: 200, products: productsAdded});    
+        } catch (internalError) {
+            console.log(internalError);
+            res.status(500).json({message: 'Internal Error!', status: 500});
+        } finally {
+            // delete all files in uploads folder
+            fs.readdir('uploads', (e1, files) => {
+                if(e1) return console.log(e1);
+    
+                for (let file of files) {
+                    fs.unlink(path.join('uploads', file), (e2) => {
+                        if(e2) return console.log(e2);
+                    })
+                }
+            })
+        }
     })
 }
 

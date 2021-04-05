@@ -4,7 +4,7 @@ class Generators {
     }
 
     * columnGenerator(max) {
-        for(let index = 3; index <= max; index++) {
+        for(let index = 2; index <= max; index++) {
             yield `${index}`;
         }
     }
