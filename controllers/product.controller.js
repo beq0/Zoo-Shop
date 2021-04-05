@@ -177,7 +177,8 @@ module.exports.sellProduct = async (req, res) => {
     benefit = (sellingPrice * fullAmountSold) - fullOriginalPrice;
 
     try {
-        addSellHistory(product, fullAmountSold, startingOriginalPrice, sellingPrice, sellDate, benefit, req.body.description);
+        addSellHistory(product, fullAmountSold, startingOriginalPrice, sellingPrice, sellDate, benefit, 
+            req.body.description, req.body.isInCash);
     } catch (e) {
         res.status(500).json({message: `Error occurred during adding sell history for product ${_id}`, status: 500});
         return;
@@ -205,7 +206,7 @@ module.exports.sellProduct = async (req, res) => {
     )
 };
 
-function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDate, benefit, description) {
+function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDate, benefit, description, isInCash) {
     const sellHistory = new SellHistory({
         productId: product._id,
         productCode: product.code,
@@ -219,6 +220,7 @@ function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDa
         official: product.official,
         benefit: benefit,
         description,
+        isInCash,
         createDate: new Date()
     });
     sellHistory.save().then(() => {

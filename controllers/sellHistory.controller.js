@@ -14,6 +14,7 @@ module.exports.addHistory = (req, res) => {
         official: req.body.official,
         benefit: ((req.body.sellingPrice || 0) - (req.body.originalPrice || 0)) * req.body.amount,
         description: req.body.description,
+        isInCash: req.body.isInCash,
         createDate: new Date()
     });
     sellHistory.save().then(() => {

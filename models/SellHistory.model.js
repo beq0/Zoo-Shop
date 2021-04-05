@@ -53,6 +53,10 @@ const sellHistorySchema = mongoose.Schema({
     },
     description: {
         type: String
+    },
+    isInCash: {
+        type: Boolean,
+        default: false
     }
 });
 
