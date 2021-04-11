@@ -65,18 +65,31 @@ module.exports.addProducts = (req, res) => {
                     quantityType : sheet['I' + index.value].v,
                     official : (sheet['J' + index.value].v == 'კი')
                 }
-                if(!productCodes.has(toAdd.code)) {
+                let possibleProduct = await Product.findOne({code: toAdd.code}).exec();
+                if(!possibleProduct) {
                     const prod = new Product({
                         ...toAdd,
                         lastChangeDate: new Date(),
                         createDate: new Date(),
                     });
-                    productCodes.add(toAdd.code);
                     const result = await prod.save();
                     productsAdded.push(result);
+                    productCodes.add(result.code);
                 } 
                 else {
-                    // update so that prices are saved correctly
+                    toAdd = {
+                        ...possibleProduct._doc, 
+                        sellingPrice: toAdd.sellingPrice, 
+                        quantity: [...possibleProduct.quantity, ...toAdd.quantity],
+                        lastChangeDate: new Date()
+                    };
+                    const result = await Product.findByIdAndUpdate({ '_id': toAdd._id }, { $set: toAdd });
+                    if(productCodes.has(result.code)) {
+                        productsAdded = productsAdded.filter((elem) => {
+                            return elem.code == result.code;
+                        });
+                        productsAdded.push(result);
+                    }
                 }
             }
             res.status(200).json({message: 'Saved Products!', status: 200, products: productsAdded});    
