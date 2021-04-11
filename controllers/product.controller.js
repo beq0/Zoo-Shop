@@ -52,7 +52,7 @@ module.exports.addProducts = (req, res) => {
                     name : sheet['B' + index.value].v,
                     providerCode : sheet['C' + index.value].v,
                     providerName : sheet['D' + index.value].v,
-                    productType : sheet['E' + index.value].v,
+                    productType : sheet['E' + index.value] ? sheet['E' + index.value].v : 'სხვა',
                     sellingPrice : sheet['F' + index.value].v,
                     quantity : [
                         {
