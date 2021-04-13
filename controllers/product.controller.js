@@ -235,26 +235,32 @@ module.exports.sellProduct = async (req, res) => {
 
     product.quantity.sort((a, b) => a.createDate - b.createDate);
     fullOriginalPrice = 0;
-    const startingOriginalPrice = product.quantity[0].originalPrice;
     const fullAmountSold = amount;
+    let soldAmounts = [];
     while (amount != 0) {
         let currOriginalPriceInfo = product.quantity[0];
         let currQuantity = currOriginalPriceInfo.quantity;
         let currOriginalPrice = currOriginalPriceInfo.originalPrice;
+        let currSoldAmount = { originalPrice: currOriginalPrice };
         if (amount > currQuantity) {
             fullOriginalPrice += currOriginalPrice * currQuantity;
             product.quantity.shift();
             amount -= currQuantity;
+            currSoldAmount['amountSold'] = currQuantity;
+            currSoldAmount['benefit'] = currQuantity * (sellingPrice - currOriginalPrice); 
         } else {
             currQuantity -= amount;
             fullOriginalPrice += currOriginalPrice * amount;
-            if (currQuantity === 0) {
+            if (getQuantity(product.quantityType, currQuantity) == 0) {
                 product.quantity.shift(); 
             } else {
-                product.quantity[0].quantity = currQuantity;
+                product.quantity[0].quantity = getQuantity(product.quantityType, currQuantity);
             }
+            currSoldAmount['amountSold'] = amount;
+            currSoldAmount['benefit'] = amount * (sellingPrice - currOriginalPrice);
             amount = 0;
         }
+        soldAmounts.push(currSoldAmount);
     }
 
     if (product.quantity.length !== 0) product.originalPrice = product.quantity[0].originalPrice;
@@ -262,8 +268,7 @@ module.exports.sellProduct = async (req, res) => {
     benefit = (sellingPrice * fullAmountSold) - fullOriginalPrice;
 
     try {
-        addSellHistory(product, fullAmountSold, startingOriginalPrice, sellingPrice, sellDate, benefit, 
-            req.body.description, req.body.isInCash);
+        addSellHistories(product, soldAmounts, sellingPrice, sellDate, req.body.description, req.body.isInCash);
     } catch (e) {
         res.status(500).json({message: `Error occurred during adding sell history for product ${_id}`, status: 500});
         return;
@@ -291,28 +296,35 @@ module.exports.sellProduct = async (req, res) => {
     )
 };
 
-function addSellHistory(product, amountSold, originalPrice, sellingPrice, sellDate, benefit, description, isInCash) {
-    const sellHistory = new SellHistory({
+function addSellHistories(product, soldAmounts, sellingPrice, sellDate, description, isInCash) {
+    let sellHistories = soldAmounts.map(a => new SellHistory({
         productId: product._id,
         productCode: product.code,
         productName: product.name,
         productType: product.productType,
         sellDate: sellDate || new Date(),
-        amount: amountSold,
+        amount: a['amountSold'],
         quantityType: product.quantityType,
-        originalPrice: originalPrice,
+        originalPrice: a['originalPrice'],
         sellingPrice: sellingPrice,
         official: product.official,
-        benefit: benefit,
+        benefit: a['benefit'],
         description,
         isInCash,
         createDate: new Date()
-    });
-    sellHistory.save().then(() => {
-        
-    }).catch((error) => {
-        throw error;
-    });
+    }));
+    console.log(sellHistories);
+    SellHistory.insertMany(sellHistories)
+        .then((res) => {
+            console.log("Inserted Sell Histories");
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+
+function getQuantity(quantityType, quantity) {
+    return quantityType == 'წონითი' ? parseFloat(quantity.toFixed(3)) : quantity;
 }
 
 async function getSingleProduct(productId) {
