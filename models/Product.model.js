@@ -11,8 +11,7 @@ const productSchema = mongoose.Schema({
         required: true
     },
     providerCode: {
-        type:String,
-        required: true
+        type:String
     },
     providerName: {
         type: String,
